@@ -29,7 +29,7 @@ jobs:
         run: env OSNAME=linux OSTYPE=firmware bash ./.github/auto_build.sh
 
       - name: 'release assets'
-        if: startsWith( github.ref, 'refs/tags/releases/')
+        #if: startsWith( github.ref, 'refs/tags/releases/')
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -39,56 +39,56 @@ jobs:
           file_glob: true
 
 
-  job-linux:
-    name: 'build linux'
-    runs-on: ubuntu-20.04
-    steps:
-      - name: 'checkout'
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+#  job-linux:
+#    name: 'build linux'
+#    runs-on: ubuntu-20.04
+#    steps:
+#      - name: 'checkout'
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: 'install packages'
+#        run: |
+#          export DEBIAN_FRONTEND=noninteractive
+#          sudo apt-get update
+#          sudo apt-get install -y gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf
+#
+#      - name: 'compile'
+#        run: env OSNAME=linux OSYTPE=linux bash ./.github/auto_build.sh
+#
+#      - name: 'release assets'
+#        if: startsWith( github.ref, 'refs/tags/releases/')
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.GITHUB_TOKEN }}
+#          file: build/*.zip
+#          tag: ${{ github.ref }}
+#          overwrite: true
+#          file_glob: true
 
-      - name: 'install packages'
-        run: |
-          export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf
 
-      - name: 'compile'
-        run: env OSNAME=linux OSYTPE=linux bash ./.github/auto_build.sh
-
-      - name: 'release assets'
-        if: startsWith( github.ref, 'refs/tags/releases/')
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/*.zip
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
-
-
-  job-osx:
-    name: 'build macos'
-    runs-on: macos-11
-    steps:
-      - name: 'checkout'
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: 'compile'
-        run: env OSNAME=macos OSTYPE=darwin CC=clang bash ./.github/auto_build.sh
-
-      - name: 'release assets'
-        if: startsWith( github.ref, 'refs/tags/releases/')
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/*.zip
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
+#  job-osx:
+#    name: 'build macos'
+#    runs-on: macos-11
+#    steps:
+#      - name: 'checkout'
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - name: 'compile'
+#        run: env OSNAME=macos OSTYPE=darwin CC=clang bash ./.github/auto_build.sh
+#
+#      - name: 'release assets'
+#        if: startsWith( github.ref, 'refs/tags/releases/')
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.GITHUB_TOKEN }}
+#          file: build/*.zip
+#          tag: ${{ github.ref }}
+#          overwrite: true
+#          file_glob: true
 
   job-windows:
     name: 'build windows'
