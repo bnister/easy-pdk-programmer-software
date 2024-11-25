@@ -289,9 +289,19 @@ static uint16_t _FPDK_SendCommand(const FPDKICTYPE type, const uint8_t command, 
   switch( type )
   {
     case FPDK_IC_FLASH:
-      _FPDK_SendBits32F(0xA5A5A5A0 | command, 32);                                                 //preamble+command
-      _FPDK_SetDatIncoming();                                                                      //set DAT incoming
-      ack = _FPDK_RecvBits32(17);                                                                  //receive ack
+      if (command < 0x10) {
+        _FPDK_SendBits32F(0xA5A5A5A0 | command, 32);                                                 //preamble+command
+        _FPDK_SetDatIncoming();                                                                      //set DAT incoming
+        ack = _FPDK_RecvBits32(17);                                                                  //receive ack
+      }
+      else { // compressed 9 bit hack
+	uint32_t cmd9 = command << 1;
+	if (command & 3) cmd9 |= 1; // compression
+        _FPDK_SendBits32F(0xA5A5A5A0 | cmd9 >> 5, 32);
+        _FPDK_SendBits32F(cmd9 & 31, 5);
+        _FPDK_SetDatIncoming();
+        ack = _FPDK_RecvBits32(13);
+      }
       _FPDK_SetDatOutgoing();                                                                      //set DAT outgoing
       break;
 
@@ -401,6 +411,37 @@ static void _FPDK_WriteAddr(const FPDKICTYPE type,
 
         for( uint32_t g=0; g<write_block_clock_groups; g++ )
         {
+          if( write_block_address_first == 34 ) // hack
+          {
+            for( uint32_t p=0; p<write_block_count; p++ ) // 4 here, 4 there...
+            {
+              for( uint32_t l=0; l<write_block_clock_group_lead_clocks; l++ )                          //leading clocks
+                _FPDK_Clock();
+
+              _FPDK_DelayUS(2);
+
+              for( uint32_t s=0; s<write_block_clock_group_slow_clocks; s++ )                          //slow clocks
+              {
+                _FPDK_CLK_UP();
+                _FPDK_DelayUS(write_block_clock_group_slow_clock_hcycle);
+                _FPDK_CLK_DOWN();
+                _FPDK_DelayUS(1);
+              }
+
+              for( uint32_t t=0; t<write_block_clock_group_trail_clocks; t++ )                         //trailing clocks
+                _FPDK_Clock();
+            }
+
+            if( g==(write_block_clock_groups-1) )
+            {
+              _FPDK_SET_DAT_F(0);
+              _FPDK_DelayUS(2);
+            }
+
+            _FPDK_Clock(); // implied, should be configurable
+          }
+          else
+          {
           if( g==(write_block_clock_groups-1) )
             _FPDK_SetDatIncoming();                                                                //set DAT incoming
 
@@ -419,6 +460,7 @@ static void _FPDK_WriteAddr(const FPDKICTYPE type,
 
           for( uint32_t t=0; t<write_block_clock_group_trail_clocks; t++ )                         //trailing clocks
             _FPDK_Clock();
+          }
         }
 
         _FPDK_SetDatOutgoing();                                                                    //set DAT outgoing

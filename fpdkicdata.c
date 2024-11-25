@@ -19,6 +19,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 static const FPDKICDATA fpdk_ic_table[] =
 {
+  { .name                                      = "PFS122B",
+    .otpid                                     = 0x20B6,
+    .id12bit                                   = 0x4B6, // FIXME can't probe
+    .type                                      = FPDK_IC_FLASH,
+    .addressbits                               = 13,
+    .codebits                                  = 14,
+    .codewords                                 = 0x800,
+    .ramsize                                   = 0x80,
+    .exclude_code_start                        = 0x7E0,  //OTP area 16 words, contains empty space for user and BGTR IHRCR factory values
+    .exclude_code_end                          = 0x7F0,
+
+    .command_trailing_clocks                   = 1, // only valid for compressed cmds
+    .cmd_read                                  = 0xC0, // compressed 0x180
+    .vdd_cmd_read                              = 3.0,
+    .vpp_cmd_read                              = 5.5,
+    .vdd_read_hv                               = 4.0,
+    .vpp_read_hv                               = 0.0,
+
+    .vdd_cmd_write                             = 3.0,
+    .vpp_cmd_write                             = 5.5,
+    .cmd_write                                 = 0x58, // compressed 0x0B0; 0x98 0x130 normal
+    .vdd_write_hv                              = 4.8,  // 7.5 normal
+    .vpp_write_hv                              = 0.0,
+    .write_block_address_first                 = 34, // fw clock hack flag
+    .write_block_size                          = 4,
+    .write_block_clock_groups                  = 4,
+    .write_block_clock_group_lead_clocks       = 6,
+    .write_block_clock_group_slow_clocks       = 1,
+    .write_block_clock_group_slow_clock_hcycle = 20,
+    .write_block_clock_group_trail_clocks      = 1,
+
+    .cmd_erase                                 = 0x4B, // compressed 0x097
+    .vdd_cmd_erase                             = 3.0,
+    .vpp_cmd_erase                             = 5.5,
+    .vdd_erase_hv                              = 4.8,
+    .vpp_erase_hv                              = 0.0,
+    .erase_clocks                              = 2,
+    .erase_clock_hcycle                        = 40000,
+  },
+
   { .name                                      = "PMS131",
     .name_variant_1                            = "PMC131",
     .otpid                                     = 0x0C83,
