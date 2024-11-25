@@ -346,7 +346,7 @@ static const FPDKICDATA fpdk_ic_table[] =
 
   { .name                                      = "PMS171B",
     .otpid                                     = 0x2D36,
-    .id12bit                                   = 0xD36,
+    .id12bit                                   = 0xE36,
     .type                                      = FPDK_IC_OTP2_2,
     .addressbits                               = 12,
     .codebits                                  = 14,
